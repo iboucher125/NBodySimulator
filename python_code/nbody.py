@@ -1,4 +1,3 @@
-import random
 import numpy as np
 import math
 import time
@@ -31,7 +30,7 @@ def getAcc(p, m, G, N):
                 dz = p[j][2]
 
                 # Calculate inverse with softening length (0.1) -- Prart to account for particles close to eachother
-                inv = (math.sqrt((dx**2 + dy**2 + dz**2 + 0.1**2)))**3
+                inv = (math.sqrt((dx**2 + dy**2 + dz**2 + 0.1**2)))**(-1.5)
 
                 # Update acceleration (x, y, z)
                 x += m[j] * dx / inv
@@ -50,6 +49,12 @@ def getAcc(p, m, G, N):
 
     return new_acc
 
+def format(data):
+    print("This function returns the updated data array/matrix")
+
+def generateOutput(data, output_file):
+    print("This function writes data to output file")
+
 
 def main():
     ''' Run N-body Simulation '''
@@ -66,6 +71,8 @@ def main():
     planet_pos = np.random.randn(N, 3)
     # print("positions: ", planet_pos)
 
+    # could make helper funttion that creates a  
+
     # Write planet positions to output file --- Not Working!!!!
     with open("output.csv","w") as f:
         f.write(str(t_start) + "\n")
@@ -75,11 +82,11 @@ def main():
         np.savetxt(f, planet_pos, fmt="%d")
         f.write("\n")
 
-    # Create N x 3 matrix of random starting velocities for each planet
+    # Create N x 3 array of random starting velocities for each planet
     planet_vel = np.random.randn(N, 3)
     # print("velocities: ", planet_vel)
 
-    # Create N x 1 vector of masses of planets --> currently all the same. Make it random?
+    # Create N x 1 array of masses of planets --> currently all the same. Make it random?
     planet_mass = 30 * np.ones((N, 1))/N # total mass is 30
     # print(planet_mass)
 
@@ -87,32 +94,33 @@ def main():
     planet_acc = getAcc(planet_pos, planet_mass, G, N)
 
     # Set number of timesteps (number of interations for simulation)
-    dt = 0.01 # Timestep duration
-    timesteps = int(5/dt) # not sure what to put here
+    td = 0.01 # Timestep duration
+    # timesteps = int(1/td) # not sure what to put here
+    timesteps = 100
 
     # Visulization setup
     grid = plt.GridSpec(3, 1, wspace=0.0, hspace=0.3)
     ax1 = plt.subplot(grid[0:2,0])
 
     # Loop for number of timesetps
-    for i in range(5): # change 5 to timesteps
+    for i in range(timesteps): # change 5 to timesteps
         # Leapfrog integration
         # 1) first half kick
-        planet_vel += planet_acc * (dt/2.0)
+        planet_vel += planet_acc * (td/2.0)
 
         # 2) Drift --> Update positions of all planets
-        planet_pos += planet_vel * dt
+        planet_pos += planet_vel * td
 
         # 3) Get new accleration for each planet
         planet_acc = getAcc(planet_pos, planet_mass, G, N)
 
         # 4) Second half of kick --> update velocities
-        planet_vel += planet_acc * (dt/2.0)
+        planet_vel += planet_acc * (td/2.0)
 
         # 5) Plot
         plt.sca(ax1)
         plt.cla()
-        plt.scatter(planet_pos[1:, 0], planet_pos[1:, 1], s=10, color = 'green')
+        plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=10, color = 'green')
         ax1.set(xlim=(-8, 8), ylim=(-8, 8))
         ax1.set_aspect('equal', 'box')
         ax1.set_xticks([-8, -6, -4, -2, 0, 2, 4, 6, 8])
