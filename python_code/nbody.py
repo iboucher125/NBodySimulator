@@ -74,20 +74,16 @@ def main():
     # could make helper funttion that creates a  
 
     # Write planet positions to output file --- Not Working!!!!
-    with open("output.csv","w") as f:
-        f.write(str(t_start) + "\n")
-
-    # Reopen and append to it --- Not Working!!!!
-    with open("output.csv","a") as f:
-        np.savetxt(f, planet_pos, fmt="%d")
-        f.write("\n")
+    f = open("output.csv", "a")
+    f.write(str(t_start) + "\n")
+    f.write(planet_pos)
 
     # Create N x 3 array of random starting velocities for each planet
     planet_vel = np.random.randn(N, 3)
     # print("velocities: ", planet_vel)
 
     # Create N x 1 array of masses of planets --> currently all the same. Make it random?
-    planet_mass = 30 * np.ones((N, 1))/N # total mass is 30
+    planet_mass = np.random.rand(100,1)
     # print(planet_mass)
 
     # Get starting accelerations of planets (N x 3 matrix)
@@ -120,7 +116,7 @@ def main():
         # 5) Plot
         plt.sca(ax1)
         plt.cla()
-        plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=10, color = 'green')
+        plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=50*planet_mass, color = 'green')
         ax1.set(xlim=(-8, 8), ylim=(-8, 8))
         ax1.set_aspect('equal', 'box')
         ax1.set_xticks([-8, -6, -4, -2, 0, 2, 4, 6, 8])
@@ -128,10 +124,8 @@ def main():
         plt.pause(0.001)
 
         # 6) Write to output file
-        with open("output.csv","a") as f:
-            f.write(str(time.time()) + "\n")
-            np.savetxt(f, planet_pos, fmt="%d")
-            f.write("\n")
+        f.write(str(time.time()) + "\n")
+        f.write(planet_pos + "\n")
     
     # Get end time of simuation
     t_end = time.time()
