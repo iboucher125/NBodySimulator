@@ -49,15 +49,29 @@ def getAcc(p, m, G, N):
 
     return new_acc
 
-def format(data):
-    print("This function returns the updated data array/matrix")
+# Return list with postions of planets for each timestep
+# data: list of postions of planets for each timestep
+# p: Planet postions (x, y, z)
+def format(data, p):
+    all_pos = []
+    for i in range(len(p)):
+        for j in range(3):
+            all_pos.append(p[i][j])
+    data.append(all_pos)
+    
+    return data
 
+# Write data to output file
 def generateOutput(data, output_file):
-    print("This function writes data to output file")
+    f = open(output_file, 'w+')
+    for i in range(len(data)):
+        f.write(str(data[i]) + "\n")
+    f.close()
 
 
 def main():
-    ''' Run N-body Simulation '''
+    ''' Generate N-body Simulation Data '''
+
     # Number of particles (start with 2)
     N = 100
     # Newton's Gravitational Constant
@@ -69,33 +83,26 @@ def main():
 
     # Create N x 3 matrix of random starting postion of planets (size N) -> each partile has x,y,z corrdinate
     planet_pos = np.random.randn(N, 3)
-    # print("positions: ", planet_pos)
 
-    # could make helper funttion that creates a  
+    # Data that will be outputed
+    data = []
+    data = format(data, planet_pos)
 
-    # Write planet positions to output file --- Not Working!!!!
-    f = open("output.csv", "a")
-    f.write(str(t_start) + "\n")
-    f.write(planet_pos)
-
-    # Create N x 3 array of random starting velocities for each planet
+    # Create N x 3 matrix of random starting velocities for each planet
     planet_vel = np.random.randn(N, 3)
-    # print("velocities: ", planet_vel)
 
-    # Create N x 1 array of masses of planets --> currently all the same. Make it random?
+    # Create N x 1 array of masses of planets
     planet_mass = np.random.rand(100,1)
-    # print(planet_mass)
 
     # Get starting accelerations of planets (N x 3 matrix)
     planet_acc = getAcc(planet_pos, planet_mass, G, N)
 
     # Set number of timesteps (number of interations for simulation)
     td = 0.01 # Timestep duration
-    # timesteps = int(1/td) # not sure what to put here
     timesteps = 100
 
     # Visulization setup
-    grid = plt.GridSpec(3, 1, wspace=0.0, hspace=0.3)
+    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
     ax1 = plt.subplot(grid[0:2,0])
 
     # Loop for number of timesetps
@@ -116,20 +123,20 @@ def main():
         # 5) Plot
         plt.sca(ax1)
         plt.cla()
-        plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=50*planet_mass, color = 'green')
+        plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=50*planet_mass, color = 'lime', edgecolor='purple')
         ax1.set(xlim=(-8, 8), ylim=(-8, 8))
         ax1.set_aspect('equal', 'box')
         ax1.set_xticks([-8, -6, -4, -2, 0, 2, 4, 6, 8])
         ax1.set_yticks([-8, -6, -4, -2, 0, 2, 4, 6, 8])
         plt.pause(0.001)
 
-        # 6) Write to output file
-        f.write(str(time.time()) + "\n")
-        f.write(planet_pos + "\n")
+        # 6) Append to data that will be outputed
+        data = format(data, planet_pos)
     
+    generateOutput(data, "output.txt")
+
     # Get end time of simuation
     t_end = time.time()
     print("Simulation duration: ", t_end - t_start)
-    f.close()
 
 main()
