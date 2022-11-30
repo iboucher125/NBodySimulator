@@ -92,18 +92,14 @@ def main():
     planet_vel = np.random.randn(N, 3)
 
     # Create N x 1 array of masses of planets
-    planet_mass = np.random.rand(100,1)
+    planet_mass = np.random.rand(N,1)
 
     # Get starting accelerations of planets (N x 3 matrix)
     planet_acc = getAcc(planet_pos, planet_mass, G, N)
 
     # Set number of timesteps (number of interations for simulation)
     td = 0.01 # Timestep duration
-    timesteps = 100
-
-    # Visulization setup
-    grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
-    ax1 = plt.subplot(grid[0:2,0])
+    timesteps = 50
 
     # Loop for number of timesetps
     for i in range(timesteps): # change 5 to timesteps
@@ -119,16 +115,6 @@ def main():
 
         # 4) Second half of kick --> update velocities
         planet_vel += planet_acc * (td/2.0)
-
-        # 5) Plot
-        plt.sca(ax1)
-        plt.cla()
-        plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=50*planet_mass, color = 'lime', edgecolor='purple')
-        ax1.set(xlim=(-8, 8), ylim=(-8, 8))
-        ax1.set_aspect('equal', 'box')
-        ax1.set_xticks([-8, -6, -4, -2, 0, 2, 4, 6, 8])
-        ax1.set_yticks([-8, -6, -4, -2, 0, 2, 4, 6, 8])
-        plt.pause(0.001)
 
         # 6) Append to data that will be outputed
         data = format(data, planet_pos)
