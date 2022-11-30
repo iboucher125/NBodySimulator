@@ -6,17 +6,19 @@ Visulizes the N-body simulation from a dataset
 '''
 def main():
     f = open("output.txt", 'r')
+    content = f.readlines()
+
+    # Recreate N x 1 array of masses of planets
+    masses = content[1].replace("[", "").replace("]", "").replace(",", "").split()
+    planet_mass = np.array(masses).astype(float)
     
     # Visulization setup
     grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
     ax1 = plt.subplot(grid[0:2,0])
     ax1.set_facecolor("blue")
 
-    # Create N x 1 array of masses of planets
-    planet_mass = np.random.rand(100,1)
-
     # Parse file to create N x 3 matrix of current planet positions
-    for line in f:
+    for line in content[2:]:
         curr_pos = line.replace("[", "").replace("]", "").replace(",", "").split()
         N = len(curr_pos) / 3 # each planet has (x,y, z)
 
@@ -33,7 +35,7 @@ def main():
         ax1.set(xlim=(-3, 3), ylim=(-3, 3))
         ax1.set_aspect('equal', 'box')
         plt.title(label= "N-Body Simulation", fontsize=20, color='black')
-        plt.pause(0.01)
+        plt.pause(0.1)
 
     f.close()
 

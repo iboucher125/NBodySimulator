@@ -4,14 +4,15 @@ import time
 import matplotlib.pyplot as plt 
 
 ''' 
-
-* Simulation of the N-body problem. Includes visulaization of the moemvents
-  of planetsin  the simulation. 
-* Should also write each planet postion (x,y,z) for each timestep to output file
-* Then we can write a python simulator that reads an output file and does the visualization
-
+* Generate momvent of planets using the N-body problem. 
+* Produces an output file with planets' positions over number of timesteps.
 '''
 
+# Return accelertaions (x, y, z) for each planet
+# p: Array of planet postions (x, y, z)
+# m: Array of planet masses
+# G: Newton's Gravitational Constant
+# N: Number of planets
 def getAcc(p, m, G, N):
     # new_acc is N x 3 matrix of updated accelerations (x, y, z for each planet)
     new_acc = np.zeros((len(p), 3))
@@ -63,7 +64,7 @@ def format(data, p):
 
 # Write data to output file
 def generateOutput(data, output_file):
-    f = open(output_file, 'w+')
+    f = open(output_file, 'a')
     for i in range(len(data)):
         f.write(str(data[i]) + "\n")
     f.close()
@@ -80,6 +81,8 @@ def main():
     np.random.seed(811)
     # Start timer -> for performance comparision
     t_start = time.time()
+    # Name of output file
+    output = "output.txt"
 
     # Create N x 3 matrix of random starting postion of planets (size N) -> each partile has x,y,z corrdinate
     planet_pos = np.random.randn(N, 3)
@@ -101,6 +104,11 @@ def main():
     td = 0.01 # Timestep duration
     timesteps = 50
 
+    f = open(output, 'w+')
+    f.write("Positions of " + str(N) + " planets over " + str(timesteps) + " timesteps: \n")
+    f.write(str(planet_mass.tolist()) + "\n")
+    f.close()
+
     # Loop for number of timesetps
     for i in range(timesteps): # change 5 to timesteps
         # Leapfrog integration
@@ -119,10 +127,10 @@ def main():
         # 6) Append to data that will be outputed
         data = format(data, planet_pos)
     
-    generateOutput(data, "output.txt")
+    generateOutput(data, output)
 
     # Get end time of simuation
     t_end = time.time()
-    print("Simulation duration: ", t_end - t_start)
+    print("Computation duration: ", t_end - t_start)
 
 main()
