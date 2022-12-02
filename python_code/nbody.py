@@ -4,7 +4,7 @@ import time
 import matplotlib.pyplot as plt 
 
 ''' 
-* Generate momvent of planets using the N-body problem. 
+* Generate movement of planets using the N-body problem. 
 * Produces an output file with planets' positions over number of timesteps.
 '''
 
@@ -22,15 +22,16 @@ def getAcc(p, m, G, N):
         x = 0
         y = 0
         z = 0
-        # Get force exerted on each particel THEN sum
+        # Calculate orce exerted on each particel THEN sum
         for j in range(N):
             if j != i:
+                # Get difference in position of neighboring planet
                 # Need x, y, z of current neighboring planet [x, y, z] --> 0, 1, 2
-                dx = p[j][0]
-                dy = p[j][1]
-                dz = p[j][2]
+                dx = p[j][0] - p[i][0]
+                dy = p[j][1] - p[i][1]
+                dz = p[j][2] - p[i][2]
 
-                # Calculate inverse with softening length (0.1) -- Prart to account for particles close to eachother
+                # Calculate inverse with softening length (0.1) -- Part to account for particles close to eachother
                 inv = (math.sqrt((dx**2 + dy**2 + dz**2 + 0.1**2)))**(-1.5)
 
                 # Update acceleration (x, y, z)
@@ -84,6 +85,8 @@ def main():
     # Name of output file
     output = "output.txt"
 
+    print("Generating data...")
+
     # Create N x 3 matrix of random starting postion of planets (size N) -> each partile has x,y,z corrdinate
     planet_pos = np.random.randn(N, 3)
 
@@ -113,7 +116,7 @@ def main():
     for i in range(timesteps): # change 5 to timesteps
         # Leapfrog integration
         # 1) first half kick
-        planet_vel += planet_acc * (td/2.0)
+        planet_vel += planet_acc * (td / 2.0)
 
         # 2) Drift --> Update positions of all planets
         planet_pos += planet_vel * td
@@ -122,7 +125,7 @@ def main():
         planet_acc = getAcc(planet_pos, planet_mass, G, N)
 
         # 4) Second half of kick --> update velocities
-        planet_vel += planet_acc * (td/2.0)
+        planet_vel += planet_acc * (td / 2.0)
 
         # 6) Append to data that will be outputed
         data = format(data, planet_pos)

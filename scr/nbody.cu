@@ -2,23 +2,52 @@
 #include <stdlib.h>
 #include <curand.h>
 #include <curand_kernel.h>
-#include "utils.h"
-#include <vector>
-#include <tuple>
+#include <chrono>
 
-#define N_THREADS 1024
-#define N_BLOCKS 16
+#define N_THREADS 2
+#define N_BLOCKS 1
 
 /*** GPU functions ***/
-__global__ void init_get_acc_kernel(curandState *state) {
+// Maybe use for initial velociites, masses, and positions
+__global__ void init_rand_kernel(curandState *state) {
  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+ curand_init(0, idx, 0, &state[idx]);
 }
 
-__global__ void get_acc_kernel(float *map, int rows, int cols, int* bx, int* by,
-                                   int steps, curandState *state) {
+// Get accelerations
+__global__ void get_acc_kernel(float *p, float *m, float G, int N, float *a, curandState *state) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  //TODO: 
+  // Get acceleration for one planet (each thread handles one)
+  float x = 0;
+  float y = 0;
+  float z = 0;
+
+  // iterate through all other planets
+  for (int i = 0; i < N; i++){
+    if(i != tid){
+      // get difference in position of neighboring planet
+      // calculate inverse
+      // update acceleration
+    }
+  }
+
+  // Adjust with Newton's Gravitational constant
+
+  // assign new x,y,z accelerations to "a"
 }
+
+// update velocity of singular planet (used each half kick)
+__global__ void get_vel_kernel(float *p, float *v, float td, curandState *state) {
+  int tid = threadIdx.x + blockIdx.x * blockDim.x;
+  // new velocity = velocity + acceleration * (td / 2.0)
+}
+
+// update position of singular planet (drift)
+__global__ void get_pos_kernel(float *p, float *v, float td, curandState *state) {
+  int tid = threadIdx.x + blockIdx.x * blockDim.x;
+  // new position = position + velocity * td
+}
+
 
 /*** CPU functions ***/
 curandState* init_rand() {
@@ -28,35 +57,92 @@ curandState* init_rand() {
   return d_state;
 }
 
-float random_walk(float* map, int rows, int cols, int steps) {
-//   
+// returns data from N-body simulation
+float* n_body(int N, int G, float td, int timesteps) {
+  // N x 3 matrix of random starting positions of planets (N x (x,y,z))
+  float* planet_pos;
+  float* d_planet_pos;
+  // N x 3 matrix of random velocities of planets
+  float* planet_vel;
+  float* d_planet_vel;
+  // N x 1 vector of random masses of planets
+  float* planet_mass;
+  float* d_planet_mass;
+  // N x 1 vector of random masses of planets
+  float* planet_acc;
+  float* d_planet_acc;
+  // N x 3 x # timesteps matrix of positions of planets over all timesteps
+  float* data;
+  float* d_data;
+
+  // Allocate memory
+
+  // Initialize pos, vel, mass here???
+  // Create starting postions --> random
+  // Add positions to data
+
+  // Create starting velocities --> random
+
+  // Create masses of planets --> keep the same or random?
+
+  // Copy variables host to device
+
+  // Get acceleration of planets --> call GPU kernel here
+
+  // Copy new accelerations device to host
+
+  // Loop for number of timesteps --> timestep 0 already complete
+  for(int i = 1; i < timesteps; i++){
+    // Have to call multiple kernels and use cudaDeviceSynchronize()
+
+    // Use leapfrog integration
+    // 1) First half kick --> update velocities
+      // get_vel kernel
+
+    // 2) Drift --> update positions
+      // get_pos kernal
+
+    // 3) update acceleration with new positions
+      // get_acc kernal
+    
+    // 4) Second half od kick --> update velocities again
+      // get_vel kernel
+    
+    // 5) Add new positions to data
+  }
+
+  // Copy varibles device to host
+
+  // Free memory
+
+  // Return data
+
 }
 
 
 int main(int argc, char** argv) {
-  if (argc != 2) {
-    printf("Usage: %s <map_file> \n", argv[0]);
-    return 1;
-  }
+  // Number of planets 
+  int N = 2;
+  // Newton's Gravitational Constant
+  float G = pow(6.67 * 10, -11);
+  // Start time of simulation
+  auto t_start = std::chrono::high_resolution_clock::now();
 
-  float *map;
-  int rows, cols;
-  read_bin(argv[1], &map, &rows, &cols);
+  //  Set number of timesteps (number of interations for simulation)
+  float td = 0.01;
+  int timesteps = 50;
 
-  printf("%d %d\n", rows, cols);
+  // Positions over all timesteps that will be written to output file
+  // call CPU function here!!
+  float* data;
 
-  // As a starting point, try to get it working with a single steps value
-  int steps = 256;
+  // Write to output file
 
-  float max_val = random_walk(map, rows, cols, steps);
-  printf("Random walk max value: %f\n", max_val);
-  
-  float max_local = local_max(map, rows, cols, steps);
-  printf("Local max value: %f\n", max_local);
+  // End time of simulation
+  auto t_end = std::chrono::high_resolution_clock::now();
 
-  float max_local_res = local_max_restart(map, rows, cols, steps);
-  printf("Local restart max value: %f\n", max_local_res);
-  
+  // Computer duration --> need to look up how... I don't remember --> print duration
+  auto total_time = std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start);
 
   return 0;
 }

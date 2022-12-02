@@ -10,6 +10,5 @@ if(NOT DEFINED CMAKE_CUDA_STANDARD)
     set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif()
 
-add_executable(nbody src/nbody.cu)
-
-target_include_directories(climb PRIVATE include)
+add_executable(nbody scr/nbody.cu)
+target_include_directories(nbody PRIVATE include)
