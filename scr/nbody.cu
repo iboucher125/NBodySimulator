@@ -33,16 +33,16 @@ __global__ void get_acc_kernel(float *p, float *m, float G, int N, float *a, cur
 
   // Adjust with Newton's Gravitational constant
 
-  // assign new x,y,z accelerations to "a"
+  // Assign new x,y,z accelerations to "a"
 }
 
-// update velocity of singular planet (used each half kick)
+// Update velocity of singular planet (used each half kick)
 __global__ void get_vel_kernel(float *p, float *v, float td, curandState *state) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // new velocity = velocity + acceleration * (td / 2.0)
 }
 
-// update position of singular planet (drift)
+// Update position of singular planet (drift)
 __global__ void get_pos_kernel(float *p, float *v, float td, curandState *state) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // new position = position + velocity * td
@@ -57,7 +57,7 @@ curandState* init_rand() {
   return d_state;
 }
 
-// returns data from N-body simulation
+// Returns data from N-body simulation
 float* n_body(int N, int G, float td, int timesteps) {
   // N x 3 matrix of random starting positions of planets (N x (x,y,z))
   float* planet_pos;

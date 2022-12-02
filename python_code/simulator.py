@@ -2,13 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt 
 
 '''
-Visulizes the N-body simulation from a dataset
+* Visulizes the N-body simulation from a dataset
 '''
+
 def main():
     f = open("output.txt", 'r')
     content = f.readlines()
 
-    # Recreate N x 1 array of masses of planets
+    # Recreate N x 1 array of planet masses
     masses = content[1].replace("[", "").replace("]", "").replace(",", "").split()
     planet_mass = np.array(masses).astype(float)
     
@@ -17,18 +18,14 @@ def main():
     ax1 = plt.subplot(grid[0:2,0])
     ax1.set_facecolor("blue")
 
-    # Parse file to create N x 3 matrix of current planet positions
+    # Parse file to create N x 3 matrix of current planet positions THEN plot
     for line in content[2:]:
-        curr_pos = line.replace("[", "").replace("]", "").replace(",", "").split()
-        N = len(curr_pos) / 3 # each planet has (x,y, z)
+        # Get planet positions
+        planet_pos = np.array(line.replace("[", "").replace("]", "").replace(",", "").split()).astype(float)
+        N = int(len(planet_pos) / 3) # each planet has (x, y, z)
+        planet_pos = planet_pos.reshape(N, 3)
 
-        # converting all items to float
-        for i in range(len(curr_pos)):
-            curr_pos[i] = float(curr_pos[i])
-        
-        planet_pos = np.array(curr_pos)
-        planet_pos = planet_pos.reshape(int(N), 3)
-
+        # Plot
         plt.sca(ax1)
         plt.cla()
         plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=100*planet_mass, color = 'lime', edgecolor='purple')

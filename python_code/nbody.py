@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 * Produces an output file with planets' positions over number of timesteps.
 '''
 
-# Return accelertaions (x, y, z) for each planet
-# p: Array of planet postions (x, y, z)
+# Return matrix of accelertaions (x, y, z) for each planet
+# p: Maxtix of planet postions (x, y, z)
 # m: Array of planet masses
 # G: Newton's Gravitational Constant
-# N: Number of planets
+# N: Number of planets (bodies)
 def getAcc(p, m, G, N):
     # new_acc is N x 3 matrix of updated accelerations (x, y, z for each planet)
     new_acc = np.zeros((len(p), 3))
@@ -52,7 +52,7 @@ def getAcc(p, m, G, N):
     return new_acc
 
 # Return list with postions of planets for each timestep
-# data: list of postions of planets for each timestep
+# data: list of maxtix of postions of planets for each timestep
 # p: Planet postions (x, y, z)
 def format(data, p):
     all_pos = []
@@ -80,19 +80,18 @@ def main():
     G = 6.67 * 10**-11
     # Random number generator seed
     np.random.seed(811)
-    # Start timer -> for performance comparision
-    t_start = time.time()
     # Name of output file
     output = "output.txt"
 
+    # Start timer -> for performance comparision
+    t_start = time.time()
     print("Generating data...")
 
     # Create N x 3 matrix of random starting postion of planets (size N) -> each partile has x,y,z corrdinate
     planet_pos = np.random.randn(N, 3)
 
     # Data that will be outputed
-    data = []
-    data = format(data, planet_pos)
+    data = format([], planet_pos)
 
     # Create N x 3 matrix of random starting velocities for each planet
     planet_vel = np.random.randn(N, 3)
@@ -105,7 +104,7 @@ def main():
 
     # Set number of timesteps (number of interations for simulation)
     td = 0.01 # Timestep duration
-    timesteps = 50
+    timesteps = 50 # Number of timesteps
 
     f = open(output, 'w+')
     f.write("Positions of " + str(N) + " planets over " + str(timesteps) + " timesteps: \n")
