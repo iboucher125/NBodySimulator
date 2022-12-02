@@ -80,8 +80,8 @@ def main():
     G = 6.67 * 10**-11
     # Random number generator seed
     np.random.seed(811)
-    # Name of output file
-    output = "output.txt"
+    # Path for output file
+    output = "../data/output_py.txt"
 
     # Start timer -> for performance comparision
     t_start = time.time()

@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 '''
 
 def main():
-    f = open("output.txt", 'r')
+    # Path for output file
+    f = open("../data/output_py.txt", 'r')
     content = f.readlines()
 
     # Recreate N x 1 array of planet masses
