@@ -32,7 +32,7 @@ def getAcc(p, m, G, N):
                 dz = p[j][2] - p[i][2]
 
                 # Calculate inverse with softening length (0.1) -- Part to account for particles close to eachother
-                inv = (math.sqrt((dx**2 + dy**2 + dz**2 + 0.1**2)))**(-1.5)
+                inv = (dx**2 + dy**2 + dz**2 + 0.1**2)**(-1.5)
 
                 # Update acceleration (x, y, z)
                 x += m[j] * dx / inv

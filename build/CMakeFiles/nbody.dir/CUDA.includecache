@@ -17,4 +17,12 @@ curand_kernel.h
 -
 chrono
 -
+random
+-
+iostream
+-
+bits/stdc++.h
+-
+math.h
+-
 
