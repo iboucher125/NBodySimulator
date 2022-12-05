@@ -33,7 +33,7 @@ def main():
         ax1.set(xlim=(-3, 3), ylim=(-3, 3))
         ax1.set_aspect('equal', 'box')
         plt.title(label= "N-Body Simulation", fontsize=20, color='black')
-        plt.pause(0.1)
+        plt.pause(0.2)
 
     f.close()
 

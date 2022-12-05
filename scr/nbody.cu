@@ -13,43 +13,45 @@
 
 /*** GPU functions ***/
 /*** Get accelerations ***/
-__global__ void get_acc_kernel(float **p, float m, float **a, float G, int N) {
+__global__ void get_acc_kernel(float *p, float *m, float *a, float G, int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  for(int i=0; i<N; i++){
-    *a = new float[3];
-    for(int j=0; j<3; j++){
-      for(int k=0; k<N; k++){
-        // // Get acceleration for one planet (each thread handles one)
-        // float x = 0;
-        // float y = 0;
-        // float z = 0;
-        // // iterate through all other planets
-        // for (int z = 0; z < N; z++){
-        //   if(z != tid){
-        //     // get difference in position of neighboring planet
-        //     float dx = p[z][0] - p[k][0];
-        //     float dy = p[z][1] - p[k][1];
-        //     float dz = p[z][2] - p[k][2];
-        //     // calculate inversepmlanet_mass
-        //     x = x + (m[z] * dx / inv);
-        //     y = y + (m[z] * dy / inv);
-        //     z = z + (m[z] * dz / inv);
-          }
-        }
-        // x = x * G;
-        // y = y * G;
-        // z = z * G;
 
-        // new_acc[k][0] = x;
-        // new_acc[k][1] = y;
-        // new_acc[k][2] = z;
-      }
+  // Accleration (x, y, z) for plaent with id tid
+  float x = 0;
+  float y = 0;
+  float z = 0;// Loop for number of timesteps --> timestep 0 already complete
+
+  for(int i=0; i<N; i++){
+    if(i != tid){
+      // get difference in position of neighboring planet
+      float dx = p[0 + i * 3] - p[0 + tid * 3];
+      float dy = p[1 + i * 3] - p[1 + tid * 3];
+      float dz = p[2 + i * 3] - p[2 + tid * 3];
+
+      // Calculate inverse with softening length (0.1) -- Part to account for particles close to eachother
+      float inv = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2) + pow(0.1, 2), -1.5);
+
+      // calculate inversepmlanet_mass
+      x = x + (m[i] * dx / inv);
+      y = y + (m[i] * dy / inv);
+      z = z + (m[i] * dz / inv);
     }
-  }
+  }      
 
   // Adjust with Newton's Gravitational constant
+  x = x * G;
+  y = y * G;
+  z = z * G;
 
   // Assign new x,y,z accelerations to "a"
+  a[0 + tid * 3] = x;
+  a[1 + tid * 3] = y;
+  a[2 + tid * 3] = z;
+  printf("%d ", tid);
+  printf("%f ", a[0 + tid * 3]);
+  printf("%f ", a[1 + tid * 3]);
+  printf("%f ", a[2 + tid * 3]);
+  printf("here");
 }
 
 // Update velocity of singular planet (used each half kick)
@@ -70,41 +72,45 @@ __global__ void get_pos_kernel(float *p, float *v, float td, curandState *state)
 // Returns data from N-body simulation
 float* n_body(int N, int G, float td, int timesteps) {
   // N x 3 matrix of random starting positions of planets (N x (x,y,z))
-  float** planet_pos = new float*[N];
-  float** d_planet_pos;
+  float* planet_pos = new float[N*3];
+  float* d_planet_pos;
   // N x 3 matrix of random velocities of planets
-  float** planet_vel = new float*[N];
-  float** d_planet_vel;
+  float* planet_vel = new float[N*3];
+  float* d_planet_vel;
   // N x 1 vector of random masses of planets
-  float planet_mass[N];
-  float d_planet_mass;
+  float* planet_mass = new float[N];
+  float* d_planet_mass;
   // N x 1 vector of random masses of planets
-  float** planet_acc[N];
-  float** d_planet_acc;
+  float* planet_acc;
+  float* d_planet_acc;
   // N x 3 x # timesteps matrix of positions of planets over all timesteps
   float*** data = new float**[timesteps];
   float** d_data;
 
   // Allocate memory
-  cudaMalloc(&d_planet_mass, planet_mass.size() * sizeof(float));
-  cudaMalloc(&d_planet_pos, planet_pos.size() * sizeof(float));
-  cudaMalloc(&d_planet_vel, planet_vel.size() * sizeof(float));
-  cudaMalloc(&d_planet_acc, planet_acc.size() * sizeof(float));
+  planet_acc = (float*)malloc((N*3)* sizeof(float));
+  planet_pos = (float*)malloc((N*3)* sizeof(float));
+  planet_vel = (float*)malloc((N*3)* sizeof(float));
+  planet_mass = (float*)malloc(N* sizeof(float));
+
+  cudaMalloc(&d_planet_mass, N * sizeof(float));
+  cudaMalloc(&d_planet_pos, N * 3 * sizeof(float));
+  cudaMalloc(&d_planet_vel, N * 3 * sizeof(float));
+  cudaMalloc(&d_planet_acc, N * 3 * sizeof(float));
 
   // Create N x 1 array of masses of planets
   for(int i=0; i<N; i++){
     planet_mass[i] = rand()/float(RAND_MAX)*1.f+0.f;
-    // std::cout << planet_mass[i] << std::endl;
   }
 
   // Create N x 3 matrix of random starting velocities & positions for each planet
-  for(int i=0; i<N; i++){
-    planet_vel[i] = new float[3];
-    planet_pos[i] = new float[3];
-    for(int j=0; j<3; j++){
-      planet_vel[i][j] = rand()/float(RAND_MAX)*1.f+0.f;
-      planet_pos[i][j] = rand()/float(RAND_MAX)*1.f+0.f;
-    }
+  for(int i= 0; i< N; i++){
+    planet_pos[0 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_pos[1 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_pos[2 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_vel[0 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_vel[1 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_vel[2 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
   }
 
   std::cout << " " << std::endl; 
@@ -114,27 +120,31 @@ float* n_body(int N, int G, float td, int timesteps) {
     for(int j=0; j<N; j++){
       data[i][j] = new float[3];
       for (int k=0; k<3; k++){
-        data[i][j][k] = planet_pos[j][k];
-        std::cout << data[i][j][k] << std::endl;
+        data[i][j][k] = planet_pos[k + 3*i];
+        // std::cout << data[i][j][k] << std::endl;
       }
     }
   }
 
-  // Copy variables host to device
-  cudaMemcpy(d_planet_mass, planet_mass, planet_mass.size() * sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(d_planet_pos, planet_pos, planet_pos.size() * sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(d_planet_vel, planet_vel, planet_vel.size() * sizeof(float), cudaMemcpyHostToDevice);
+  // Copy variables from host to device
+  cudaMemcpy(d_planet_mass, planet_mass, N * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_planet_pos, planet_pos, N * 3 * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_planet_vel, planet_vel, N * 3 * sizeof(float), cudaMemcpyHostToDevice);
 
   // Get acceleration of planets --> call GPU kernel here
   get_acc_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_mass, planet_acc, G, N);
 
-
   // Copy new accelerations device to host
+  cudaMemcpy(planet_acc, d_planet_acc, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
+
+  // Debugging acceleration:
+  for(int i=0; i< (N * 3); i++){
+    // std::cout << planet_acc << std::endl;
+  }
 
   // Loop for number of timesteps --> timestep 0 already complete
   for(int i = 1; i < timesteps; i++){
     // Have to call multiple kernels and use cudaDeviceSynchronize()
-
     // Use leapfrog integration
     // 1) First half kick --> update velocities
       // get_vel kernel
