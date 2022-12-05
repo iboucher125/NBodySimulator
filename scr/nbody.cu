@@ -19,14 +19,20 @@ __global__ void get_acc_kernel(float *p, float *m, float *a, float G, int N) {
   // Accleration (x, y, z) for plaent with id tid
   float x = 0;
   float y = 0;
-  float z = 0;// Loop for number of timesteps --> timestep 0 already complete
+  float z = 0;
+  printf("G: %f \n", G);
 
   for(int i=0; i<N; i++){
     if(i != tid){
+      printf("ID: %d \n", tid);
+      printf("pos: %f \n", p[0 + i * 3]);
       // get difference in position of neighboring planet
       float dx = p[0 + i * 3] - p[0 + tid * 3];
       float dy = p[1 + i * 3] - p[1 + tid * 3];
       float dz = p[2 + i * 3] - p[2 + tid * 3];
+      printf("dx: %f \n", dx);
+      printf("dy: %f \n", dy);
+      printf("dz: %f \n", dz);
 
       // Calculate inverse with softening length (0.1) -- Part to account for particles close to eachother
       float inv = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2) + pow(0.1, 2), -1.5);
@@ -118,31 +124,17 @@ float* n_body(int N, int G, float td, int timesteps) {
 
   // Create N x 3 matrix of random starting velocities & positions for each planet
   for(int i= 0; i< N; i++){
-    planet_pos[0 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
-    planet_pos[1 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
-    planet_pos[2 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
-    planet_vel[0 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
-    planet_vel[1 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
-    planet_vel[2 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_pos[0 + 3 * i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_pos[1 + 3 * i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_pos[2 + 3 * i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_vel[0 + 3 * i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_vel[1 + 3 * i] = rand()/float(RAND_MAX)*1.f+0.f;
+    planet_vel[2 + 3 * i] = rand()/float(RAND_MAX)*1.f+0.f;
     // Note sure if this idx is correct!
     data[0 + (i * 3 * timesteps)] = planet_pos[0 + 3*i];
     data[1 + (i * 3 * timesteps)] = planet_pos[1 + 3*i];
     data[2 + (i * 3 * timesteps)] = planet_pos[2 + 3*i];
   }
-
-  // OLD METHOD:
-  // std::cout << " " << std::endl; 
-  // // Add matrix of positions to data
-  // for(int i=0; i<1; i++){
-  //   data[i] = new float*[N];
-  //   for(int j=0; j<N; j++){
-  //     data[i][j] = new float[3];
-  //     for (int k=0; k<3; k++){
-  //       data[i][j][k] = planet_pos[k + 3*i];
-  //       // std::cout << data[i][j][k] << std::endl;
-  //     }
-  //   }
-  // }
 
   // Copy variables from host to device
   cudaMemcpy(d_planet_mass, planet_mass, N * sizeof(float), cudaMemcpyHostToDevice);
@@ -158,7 +150,10 @@ float* n_body(int N, int G, float td, int timesteps) {
 
   // // Debugging acceleration:
   // for(int i=0; i< (N * 3); i++){
-  //   // std::cout << planet_acc << std::endl;
+  //   std::cout << *planet_acc << std::endl;
+  // }
+  // for(int i=0; i< (N * 3); i++){
+  //   std::cout << planet_pos[i] << std::endl;
   // }
 
   // Loop for number of timesteps --> timestep 0 already complete
@@ -199,7 +194,8 @@ int main(int argc, char** argv) {
   // Number of planets 
   int N = 2;
   // Newton's Gravitational Constant
-  float G = pow(6.67 * 10, -11);
+  // float G = pow(6.67 * 10, -11);
+  float G = 1.55;
   // Start time of simulation
   auto t_start = std::chrono::high_resolution_clock::now();
 
