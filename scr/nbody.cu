@@ -55,15 +55,26 @@ __global__ void get_acc_kernel(float *p, float *m, float *a, float G, int N) {
 }
 
 // Update velocity of singular planet (used each half kick)
-__global__ void get_vel_kernel(float *p, float *v, float td, curandState *state) {
+__global__ void get_vel_kernel(float *v, float *a, float td) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // new velocity = velocity + acceleration * (td / 2.0)
+  v[0 + tid * 3] = v[0 + tid * 3] + (a[0 + tid * 3] * td / 2.0);
+  v[1 + tid * 3] = v[1 + tid * 3] + (a[1 + tid * 3] * td / 2.0);
+  v[2 + tid * 3] = v[2 + tid * 3] + (a[2 + tid * 3] * td / 2.0);
 }
 
 // Update position of singular planet (drift)
-__global__ void get_pos_kernel(float *p, float *v, float td, curandState *state) {
+__global__ void get_pos_kernel(float *p, float *v, float *data, float td, float timesteps, int i) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // new position = position + velocity * td
+  p[0 + tid * 3] = p[0 + tid * 3] + (v[0 + tid * 3] * td);
+  p[1 + tid * 3] = p[1 + tid * 3] + (v[1 + tid * 3] * td);
+  p[2 + tid * 3] = p[2 + tid * 3] + (v[2 + tid * 3] * td);
+
+  // // idx probably wrongs here!!! --> also error "expression must have integral or unscoped enum type"
+  // data[0 + (tid * 3 * timesteps) + (i * 3)] = p[0 + tid * 3];
+  // data[1 + (tid * 3 * timesteps) + (i * 3)] = p[1 + tid * 3];
+  // data[2 + (tid * 3 * timesteps) + (i * 3)] = p[2 + tid * 3];
 }
 
 
@@ -84,19 +95,21 @@ float* n_body(int N, int G, float td, int timesteps) {
   float* planet_acc;
   float* d_planet_acc;
   // N x 3 x # timesteps matrix of positions of planets over all timesteps
-  float*** data = new float**[timesteps];
-  float** d_data;
+  float* data = new float[N * 3 * timesteps];
+  float* d_data;
 
   // Allocate memory
   planet_acc = (float*)malloc((N*3)* sizeof(float));
   planet_pos = (float*)malloc((N*3)* sizeof(float));
   planet_vel = (float*)malloc((N*3)* sizeof(float));
-  planet_mass = (float*)malloc(N* sizeof(float));
+  planet_mass = (float*)malloc(N * sizeof(float));
+  data = (float*)malloc(N * 3 * timesteps * sizeof(float));
 
   cudaMalloc(&d_planet_mass, N * sizeof(float));
   cudaMalloc(&d_planet_pos, N * 3 * sizeof(float));
   cudaMalloc(&d_planet_vel, N * 3 * sizeof(float));
   cudaMalloc(&d_planet_acc, N * 3 * sizeof(float));
+  cudaMalloc(&d_data, N * 3 * timesteps * sizeof(float));
 
   // Create N x 1 array of masses of planets
   for(int i=0; i<N; i++){
@@ -111,25 +124,31 @@ float* n_body(int N, int G, float td, int timesteps) {
     planet_vel[0 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
     planet_vel[1 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
     planet_vel[2 + 3*i] = rand()/float(RAND_MAX)*1.f+0.f;
+    // Note sure if this idx is correct!
+    data[0 + (i * 3 * timesteps)] = planet_pos[0 + 3*i];
+    data[1 + (i * 3 * timesteps)] = planet_pos[1 + 3*i];
+    data[2 + (i * 3 * timesteps)] = planet_pos[2 + 3*i];
   }
 
-  std::cout << " " << std::endl; 
-  // Add matrix of positions to data
-  for(int i=0; i<1; i++){
-    data[i] = new float*[N];
-    for(int j=0; j<N; j++){
-      data[i][j] = new float[3];
-      for (int k=0; k<3; k++){
-        data[i][j][k] = planet_pos[k + 3*i];
-        // std::cout << data[i][j][k] << std::endl;
-      }
-    }
-  }
+  // OLD METHOD:
+  // std::cout << " " << std::endl; 
+  // // Add matrix of positions to data
+  // for(int i=0; i<1; i++){
+  //   data[i] = new float*[N];
+  //   for(int j=0; j<N; j++){
+  //     data[i][j] = new float[3];
+  //     for (int k=0; k<3; k++){
+  //       data[i][j][k] = planet_pos[k + 3*i];
+  //       // std::cout << data[i][j][k] << std::endl;
+  //     }
+  //   }
+  // }
 
   // Copy variables from host to device
   cudaMemcpy(d_planet_mass, planet_mass, N * sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(d_planet_pos, planet_pos, N * 3 * sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(d_planet_vel, planet_vel, N * 3 * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_data, data, N * 3 * timesteps * sizeof(float), cudaMemcpyHostToDevice);
 
   // Get acceleration of planets --> call GPU kernel here
   get_acc_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_mass, planet_acc, G, N);
@@ -137,31 +156,37 @@ float* n_body(int N, int G, float td, int timesteps) {
   // Copy new accelerations device to host
   cudaMemcpy(planet_acc, d_planet_acc, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
 
-  // Debugging acceleration:
-  for(int i=0; i< (N * 3); i++){
-    // std::cout << planet_acc << std::endl;
-  }
+  // // Debugging acceleration:
+  // for(int i=0; i< (N * 3); i++){
+  //   // std::cout << planet_acc << std::endl;
+  // }
 
   // Loop for number of timesteps --> timestep 0 already complete
   for(int i = 1; i < timesteps; i++){
     // Have to call multiple kernels and use cudaDeviceSynchronize()
     // Use leapfrog integration
     // 1) First half kick --> update velocities
-      // get_vel kernel
+    get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(planet_vel, planet_acc, td);
+    cudaDeviceSynchronize();
 
     // 2) Drift --> update positions
-      // get_pos kernal
+    get_pos_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_vel, data, td, timesteps, i);
+    cudaDeviceSynchronize();
 
     // 3) update acceleration with new positions
-      // get_acc kernal
+    get_acc_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_mass, planet_acc, G, N);
+    cudaDeviceSynchronize();
     
     // 4) Second half od kick --> update velocities again
-      // get_vel kernel
+    get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(planet_vel, planet_acc, td);
+    cudaDeviceSynchronize();
     
-    // 5) Add new positions to data
+    // 5) Add new positions to data --> not sure if we should copy memory back over here and the recopy back
+    cudaMemcpy(planet_pos, d_planet_pos, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
   }
 
-  // Copy varibles device to host
+  // Copy varibles device to host --> maybe just need 
+  cudaMemcpy(planet_pos, d_planet_pos, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
 
   // Free memory
 
