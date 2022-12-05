@@ -104,7 +104,7 @@ def main():
 
     # Set number of timesteps (number of interations for simulation)
     td = 0.01 # Timestep duration
-    timesteps = 50 # Number of timesteps
+    timesteps = 100 # Number of timesteps
 
     f = open(output, 'w+')
     f.write("Positions of " + str(N) + " planets over " + str(timesteps) + " timesteps: \n")
