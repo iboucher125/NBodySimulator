@@ -7,6 +7,7 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <math.h>
+#include <fstream>
 
 #define N_THREADS 2
 #define N_BLOCKS 1
@@ -84,7 +85,7 @@ __global__ void get_pos_kernel(double *p, double *v, double *data, double td, in
 /*** CPU functions ***/
 
 // Returns data from N-body simulation
-double* n_body(int N, double G, double td, int timesteps) {
+double* n_body(double *planet_mass, int N, double G, double td, int timesteps) {
   // N x 3 matrix of random starting positions of planets (N x (x,y,z))
   double* planet_pos = new double[N*3];
   double* d_planet_pos;
@@ -92,7 +93,7 @@ double* n_body(int N, double G, double td, int timesteps) {
   double* planet_vel = new double[N*3];
   double* d_planet_vel;
   // N x 1 vector of random masses of planets
-  double* planet_mass = new double[N];
+  // double* planet_mass = new double[N];
   double* d_planet_mass;
   // N x 1 vector of random masses of planets
   double* planet_acc;
@@ -114,10 +115,10 @@ double* n_body(int N, double G, double td, int timesteps) {
   cudaMalloc(&d_planet_acc, N * 3 * sizeof(double));
   cudaMalloc(&d_data, N * 3 * timesteps * sizeof(double));
 
-  // Create N x 1 array of masses of planets
-  for(int i=0; i<N; i++){
-    planet_mass[i] = rand()/double(RAND_MAX)*1.f+0.f;
-  }
+  // // Create N x 1 array of masses of planets
+  // for(int i=0; i<N; i++){
+  //   planet_mass[i] = rand()/double(RAND_MAX)*1.f+0.f;
+  // }
 
   // Create N x 3 matrix of random starting velocities & positions for each planet
   for(int i= 0; i< N; i++){
@@ -168,9 +169,6 @@ double* n_body(int N, double G, double td, int timesteps) {
   // Copy varibles device to host --> maybe just need 
   cudaMemcpy(data, d_data, (N * 3 * timesteps) * sizeof(double), cudaMemcpyDeviceToHost);
 
-  for (int i=0; i<N*3*timesteps; i++){
-    std::cout << data[i] << std::endl;
-  }
   // Free memory
   cudaFree(d_planet_pos);
   cudaFree(d_planet_vel);
@@ -201,17 +199,51 @@ int main(int argc, char** argv) {
   double td = 0.01;
   int timesteps = 50;
 
-  // Positions over all timesteps that will be written to output file
+  // Create N x 1 array of masses of planets
+  double* planet_mass = new double[N];
+  for(int i=0; i<N; i++){
+    planet_mass[i] = rand()/double(RAND_MAX)*1.f+0.f;
+  }
   // call CPU function here!!
-  double* data = n_body(N, G, td, timesteps);
+  double* data = n_body(planet_mass, N, G, td, timesteps);
 
   // Write to output file
+  std::ofstream output_file;
+  output_file.open("../data/output_cu.txt");
+  output_file << "Positions of " << N << " planets over " << timesteps <<" timesteps: \n";
+  // Write masses
+  for(int i=0; i < N; i++){
+    if (i == N -1){
+      output_file << planet_mass[i] << "\n";
+    }
+    else{
+      output_file << planet_mass[i] << ", ";
+    }
+  }
+
+  // Write positions
+  int curr_step = 0;
+  for(int i=0; i < timesteps; i++){
+    for(int j=0; j < N * 3; j++){
+      if (j == N * 3 -1){
+        output_file << data[j + (N * 3 * i)] << "\n";
+      }
+      else{
+        output_file << data[j + (N * 3 * i)] << ", ";
+      }
+    }
+  }
+  output_file.close();
+
+  // Free positions
+  free(data);
 
   // End time of simulation
   auto t_end = std::chrono::high_resolution_clock::now();
 
   // Computer duration --> need to look up how... I don't remember --> print duration
   auto total_time = std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start);
+  std::cout << "Computation Duration: " << total_time.count() << std::endl;
 
   return 0;
 }

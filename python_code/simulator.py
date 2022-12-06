@@ -8,11 +8,13 @@ import matplotlib.pyplot as plt
 def main():
     # Path for output file
     f = open("../data/output_py.txt", 'r')
+    # f = open("../data/output_cu.txt", 'r')
     content = f.readlines()
 
     # Recreate N x 1 array of planet masses
     masses = content[1].replace("[", "").replace("]", "").replace(",", "").split()
     planet_mass = np.array(masses).astype(float)
+    # print(planet_mass)
     
     # Visulization setup
     grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)
