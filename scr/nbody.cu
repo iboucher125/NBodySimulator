@@ -13,6 +13,14 @@
 
 /*** GPU functions ***/
 /*** Get accelerations ***/
+// Run N-body simulation
+__global__ void generate_data_kernel(float *v, float *a, float td) {
+  int tid = threadIdx.x + blockIdx.x * blockDim.x;
+  //TODO: move leap-frog integration from CPU function to here
+  // change other kernels to __device__
+}
+
+// Update acceleration of planets
 __global__ void get_acc_kernel(float *p, float *m, float *a, float G, int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -21,18 +29,17 @@ __global__ void get_acc_kernel(float *p, float *m, float *a, float G, int N) {
   float y = 0;
   float z = 0;
   printf("G: %f \n", G);
+  printf("p[0]: %f \n", p[0]);
 
   for(int i=0; i<N; i++){
     if(i != tid){
-      printf("ID: %d \n", tid);
-      printf("pos: %f \n", p[0 + i * 3]);
       // get difference in position of neighboring planet
       float dx = p[0 + i * 3] - p[0 + tid * 3];
       float dy = p[1 + i * 3] - p[1 + tid * 3];
       float dz = p[2 + i * 3] - p[2 + tid * 3];
-      printf("dx: %f \n", dx);
-      printf("dy: %f \n", dy);
-      printf("dz: %f \n", dz);
+      // printf("dx: %f \n", dx);
+      // printf("dy: %f \n", dy);
+      // printf("dz: %f \n", dz);
 
       // Calculate inverse with softening length (0.1) -- Part to account for particles close to eachother
       float inv = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2) + pow(0.1, 2), -1.5);
@@ -53,11 +60,9 @@ __global__ void get_acc_kernel(float *p, float *m, float *a, float G, int N) {
   a[0 + tid * 3] = x;
   a[1 + tid * 3] = y;
   a[2 + tid * 3] = z;
-  printf("%d ", tid);
-  printf("%f ", a[0 + tid * 3]);
-  printf("%f ", a[1 + tid * 3]);
-  printf("%f ", a[2 + tid * 3]);
-  printf("here");
+  // printf("%f ", a[0 + tid * 3]);
+  // printf("%f ", a[1 + tid * 3]);
+  // printf("%f ", a[2 + tid * 3]);
 }
 
 // Update velocity of singular planet (used each half kick)
@@ -148,45 +153,46 @@ float* n_body(int N, int G, float td, int timesteps) {
   // Copy new accelerations device to host
   cudaMemcpy(planet_acc, d_planet_acc, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
 
-  // // Debugging acceleration:
-  // for(int i=0; i< (N * 3); i++){
-  //   std::cout << *planet_acc << std::endl;
-  // }
-  // for(int i=0; i< (N * 3); i++){
-  //   std::cout << planet_pos[i] << std::endl;
-  // }
+  // // Loop for number of timesteps --> timestep 0 already complete
+  // for(int i = 1; i < timesteps; i++){
+  //   // Have to call multiple kernels and use cudaDeviceSynchronize()
+  //   // Use leapfrog integration
+  //   // 1) First half kick --> update velocities
+  //   get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(planet_vel, planet_acc, td);
+  //   cudaDeviceSynchronize();
 
-  // Loop for number of timesteps --> timestep 0 already complete
-  for(int i = 1; i < timesteps; i++){
-    // Have to call multiple kernels and use cudaDeviceSynchronize()
-    // Use leapfrog integration
-    // 1) First half kick --> update velocities
-    get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(planet_vel, planet_acc, td);
-    cudaDeviceSynchronize();
+  //   // 2) Drift --> update positions
+  //   get_pos_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_vel, data, td, timesteps, i);
+  //   cudaDeviceSynchronize();
 
-    // 2) Drift --> update positions
-    get_pos_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_vel, data, td, timesteps, i);
-    cudaDeviceSynchronize();
-
-    // 3) update acceleration with new positions
-    get_acc_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_mass, planet_acc, G, N);
-    cudaDeviceSynchronize();
+  //   // 3) update acceleration with new positions
+  //   get_acc_kernel<<<N_BLOCKS, N_THREADS>>>(planet_pos, planet_mass, planet_acc, G, N);
+  //   cudaDeviceSynchronize();
     
-    // 4) Second half od kick --> update velocities again
-    get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(planet_vel, planet_acc, td);
-    cudaDeviceSynchronize();
+  //   // 4) Second half od kick --> update velocities again
+  //   get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(planet_vel, planet_acc, td);
+  //   cudaDeviceSynchronize();
     
-    // 5) Add new positions to data --> not sure if we should copy memory back over here and the recopy back
-    cudaMemcpy(planet_pos, d_planet_pos, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
-  }
+  //   // 5) Add new positions to data --> not sure if we should copy memory back over here and the recopy back
+  //   cudaMemcpy(planet_pos, d_planet_pos, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
+  // }
 
   // Copy varibles device to host --> maybe just need 
-  cudaMemcpy(planet_pos, d_planet_pos, N * 3 * sizeof(float), cudaMemcpyDeviceToHost);
+  cudaMemcpy(data, d_data, (N * 3 * timesteps) * sizeof(float), cudaMemcpyDeviceToHost);
 
   // Free memory
+  cudaFree(d_planet_pos);
+  cudaFree(d_planet_vel);
+  cudaFree(d_planet_acc);
+  cudaFree(d_planet_mass);
+  cudaFree(d_data);
+  free(planet_pos);
+  free(planet_vel);
+  free(planet_acc);
+  free(planet_mass); 
 
-  // Return data
-
+  // Return all positions --> data
+  return data;
 }
 
 
@@ -205,10 +211,7 @@ int main(int argc, char** argv) {
 
   // Positions over all timesteps that will be written to output file
   // call CPU function here!!
-  float* data;
-
-  // debug
-  n_body(N, G, td, timesteps);
+  float* data = n_body(N, G, td, timesteps);
 
   // Write to output file
 
