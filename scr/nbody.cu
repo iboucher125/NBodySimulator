@@ -24,26 +24,17 @@ __global__ void generate_data_kernel(double *v, double *a, double td) {
 __global__ void get_acc_kernel(double *p, double *m, double *a, double G, int N) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
-  float h = 0.055;
-
   // Accleration (x, y, z) for plaent with id tid
   double x = 0;
   double y = 0;
   double z = 0;
-  printf("G: %d \n", h);
-  for (int i=0; i< N*3; i++){
-    printf("p[i]: %f \n", p[i]);
-  }
 
   for(int i=0; i<N; i++){
     if(i != tid){
-      // get difference in position of neighboring planet
+      // Get difference in position of neighboring planet
       double dx = p[0 + i * 3] - p[0 + tid * 3];
       double dy = p[1 + i * 3] - p[1 + tid * 3];
       double dz = p[2 + i * 3] - p[2 + tid * 3];
-      // printf("dx: %f \n", dx);
-      // printf("dy: %f \n", dy);
-      // printf("dz: %f \n", dz);
 
       // Calculate inverse with softening length (0.1) -- Part to account for particles close to eachother
       double inv = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2) + pow(0.1, 2), -1.5);
@@ -64,9 +55,6 @@ __global__ void get_acc_kernel(double *p, double *m, double *a, double G, int N)
   a[0 + tid * 3] = x;
   a[1 + tid * 3] = y;
   a[2 + tid * 3] = z;
-  // printf("%f ", a[0 + tid * 3]);
-  // printf("%f ", a[1 + tid * 3]);
-  // printf("%f ", a[2 + tid * 3]);
 }
 
 // Update velocity of singular planet (used each half kick)
@@ -78,25 +66,25 @@ __global__ void get_vel_kernel(double *v, double *a, double td) {
   v[2 + tid * 3] = v[2 + tid * 3] + (a[2 + tid * 3] * td / 2.0);
 }
 
-// Update position of singular planet (drift)
-__global__ void get_pos_kernel(double *p, double *v, double *data, double td, double timesteps, int i) {
+  // Update position of singular planet (drift)
+__global__ void get_pos_kernel(double *p, double *v, double *data, double td, int timesteps, int i) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // new position = position + velocity * td
   p[0 + tid * 3] = p[0 + tid * 3] + (v[0 + tid * 3] * td);
   p[1 + tid * 3] = p[1 + tid * 3] + (v[1 + tid * 3] * td);
   p[2 + tid * 3] = p[2 + tid * 3] + (v[2 + tid * 3] * td);
 
-  // // idx probably wrongs here!!! --> also error "expression must have integral or unscoped enum type"
-  // data[0 + (tid * 3 * timesteps) + (i * 3)] = p[0 + tid * 3];
-  // data[1 + (tid * 3 * timesteps) + (i * 3)] = p[1 + tid * 3];
-  // data[2 + (tid * 3 * timesteps) + (i * 3)] = p[2 + tid * 3];
+  // idx probably wrongs here!!! --> also error "expression must have integral or unscoped enum type"
+  data[0 + (tid * 3 * timesteps) + (i * 3)] = p[0 + tid * 3];
+  data[1 + (tid * 3 * timesteps) + (i * 3)] = p[1 + tid * 3];
+  data[2 + (tid * 3 * timesteps) + (i * 3)] = p[2 + tid * 3];
 }
 
 
 /*** CPU functions ***/
 
 // Returns data from N-body simulation
-double* n_body(int N, int G, double td, int timesteps) {
+double* n_body(int N, double G, double td, int timesteps) {
   // N x 3 matrix of random starting positions of planets (N x (x,y,z))
   double* planet_pos = new double[N*3];
   double* d_planet_pos;
@@ -175,15 +163,14 @@ double* n_body(int N, int G, double td, int timesteps) {
     
     // 4) Second half od kick --> update velocities again
     get_vel_kernel<<<N_BLOCKS, N_THREADS>>>(d_planet_vel, d_planet_acc, td);
-    cudaDeviceSynchronize();
-    
-    // 5) Add new positions to data --> not sure if we should copy memory back over here and the recopy back
-    cudaMemcpy(planet_pos, d_planet_pos, N * 3 * sizeof(double), cudaMemcpyDeviceToHost);
   }
 
   // Copy varibles device to host --> maybe just need 
   cudaMemcpy(data, d_data, (N * 3 * timesteps) * sizeof(double), cudaMemcpyDeviceToHost);
 
+  for (int i=0; i<N*3*timesteps; i++){
+    std::cout << data[i] << std::endl;
+  }
   // Free memory
   cudaFree(d_planet_pos);
   cudaFree(d_planet_vel);
@@ -204,8 +191,9 @@ int main(int argc, char** argv) {
   // Number of planets 
   int N = 2;
   // Newton's Gravitational Constant
-  // double G = pow(6.67 * 10, -11);
-  double G = 1.55;
+  double G = pow(6.67 * 10, -11);
+  std::cout << G << std::endl;
+  // double G = 1.55;
   // Start time of simulation
   auto t_start = std::chrono::high_resolution_clock::now();
 
