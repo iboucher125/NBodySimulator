@@ -6,5 +6,5 @@ CUDA_FLAGS =   -std=c++11
 
 CUDA_DEFINES = 
 
-CUDA_INCLUDES = -I/cps/home/iboucher/Desktop/Parallel/NBodySimulator/include 
+CUDA_INCLUDES = -I/cps/home/ldinh/Desktop/parallel/final_proj/NBodySimulator/include 
 

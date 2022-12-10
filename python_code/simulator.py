@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 def main():
     # Path for output file
-    f = open("../data/output_py.txt", 'r')
-    # f = open("../data/output_cu.txt", 'r')
+    #f = open("../data/output_py.txt", 'r')
+    f = open("../data/output_cu.txt", 'r')
     content = f.readlines()
 
     # Recreate N x 1 array of planet masses
@@ -32,10 +32,10 @@ def main():
         plt.sca(ax1)
         plt.cla()
         plt.scatter(planet_pos[:, 0], planet_pos[:, 1], s=100*planet_mass, color = 'lime', edgecolor='purple')
-        ax1.set(xlim=(-3, 3), ylim=(-3, 3))
+        ax1.set(xlim=(-2, 2), ylim=(-2, 2))
         ax1.set_aspect('equal', 'box')
         plt.title(label= "N-Body Simulation", fontsize=20, color='black')
-        plt.pause(0.1)
+        plt.pause(0.001)
 
     f.close()
 

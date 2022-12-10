@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/cps/home/iboucher/Desktop/Parallel/NBodySimulator/scr/nbody.cu
+/cps/home/ldinh/Desktop/parallel/final_proj/NBodySimulator/scr/nbody.cu
 stdio.h
 -
 stdlib.h
