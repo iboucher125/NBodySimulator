@@ -5,20 +5,20 @@ import matplotlib.pyplot as plt
 import sys
 
 ''' 
-* Generate movement of planets using the N-body problem. 
-* Produces an output file with planets' positions over number of timesteps.
+* Generate movement of particles using the N-body problem. 
+* Produces an output file with particles' positions over number of timesteps.
 '''
 
-# Return matrix of accelertaions (x, y, z) for each planet
-# p: Maxtix of planet postions (x, y, z)
-# m: Array of planet masses
+# Return matrix of accelertaions (x, y, z) for each particle
+# p: Maxtix of particle postions (x, y, z)
+# m: Array of particle masses
 # G: Newton's Gravitational Constant
-# N: Number of planets (bodies)
+# N: Number of particles (bodies)
 def getAcc(p, m, G, N):
-    # new_acc is N x 3 matrix of updated accelerations (x, y, z for each planet)
+    # new_acc is N x 3 matrix of updated accelerations (x, y, z for each particle)
     new_acc = np.zeros((len(p), 3))
     
-    # get accleration for each planet
+    # get accleration for each particle
     for i in range(N):
         x = 0
         y = 0
@@ -26,8 +26,8 @@ def getAcc(p, m, G, N):
         # Calculate orce exerted on each particel THEN sum
         for j in range(N):
             if j != i:
-                # Get difference in position of neighboring planet
-                # Need x, y, z of current neighboring planet [x, y, z] --> 0, 1, 2
+                # Get difference in position of neighboring particle
+                # Need x, y, z of current neighboring particle [x, y, z] --> 0, 1, 2
                 dx = p[j][0] - p[i][0]
                 dy = p[j][1] - p[i][1]
                 dz = p[j][2] - p[i][2]
@@ -52,9 +52,9 @@ def getAcc(p, m, G, N):
 
     return new_acc
 
-# Return list with postions of planets for each timestep
-# data: list of maxtix of postions of planets for each timestep
-# p: Planet postions (x, y, z)
+# Return array with postions of particles for each timestep
+# data: array of maxtix of postions of particles for each timestep
+# p: particle postions (x, y, z)
 def format(data, p):
     all_pos = []
     for i in range(len(p)):
@@ -65,6 +65,8 @@ def format(data, p):
     return data
 
 # Write data to output file
+# data: array of maxtix of postions of particles for each timestep
+# output_file: name of output file
 def generateOutput(data, output_file):
     f = open(output_file, 'a')
     for i in range(len(data)):
@@ -75,7 +77,7 @@ def generateOutput(data, output_file):
 def main():
     ''' Generate N-body Simulation Data '''
 
-    # Number of particles (start with 2)
+    # Number of particles
     N = int(sys.argv[1])
     # Newton's Gravitational Constant
     G = 6.67 * 10**-11
@@ -88,47 +90,47 @@ def main():
     t_start = time.time()
     print("Generating data...")
 
-    # Create N x 3 matrix of random starting postion of planets (size N) -> each partile has x,y,z corrdinate
-    planet_pos = np.random.randn(N, 3)
+    # Create N x 3 matrix of random starting postion of particles (size N) -> each partile has x,y,z corrdinate
+    particle_pos = np.random.randn(N, 3)
 
     # Data that will be outputed
-    data = format([], planet_pos)
+    data = format([], particle_pos)
 
-    # Create N x 3 matrix of random starting velocities for each planet
-    planet_vel = np.random.randn(N, 3)
+    # Create N x 3 matrix of random starting velocities for each particle
+    particle_vel = np.random.randn(N, 3)
 
-    # Create N x 1 array of masses of planets
-    planet_mass = np.random.rand(N,1)
+    # Create N x 1 array of masses of particles
+    particle_mass = np.random.rand(N,1)
 
-    # Get starting accelerations of planets (N x 3 matrix)
-    planet_acc = getAcc(planet_pos, planet_mass, G, N)
+    # Get starting accelerations of particles (N x 3 matrix)
+    particle_acc = getAcc(particle_pos, particle_mass, G, N)
 
     # Set number of timesteps (number of interations for simulation)
     td = 0.01 # Timestep duration
     timesteps = int(sys.argv[2]) # Number of timesteps
 
     f = open(output, 'w+')
-    f.write("Positions of " + str(N) + " planets over " + str(timesteps) + " timesteps: \n")
-    f.write(str(planet_mass.tolist()) + "\n")
+    f.write("Positions of " + str(N) + " particles over " + str(timesteps) + " timesteps: \n")
+    f.write(str(particle_mass.tolist()) + "\n")
     f.close()
 
     # Loop for number of timesetps
     for i in range(timesteps): # change 5 to timesteps
         # Leapfrog integration
         # 1) first half kick
-        planet_vel += planet_acc * (td / 2.0)
+        particle_vel += particle_acc * (td / 2.0)
 
-        # 2) Drift --> Update positions of all planets
-        planet_pos += planet_vel * td
+        # 2) Drift --> Update positions of all particles
+        particle_pos += particle_vel * td
 
-        # 3) Get new accleration for each planet
-        planet_acc = getAcc(planet_pos, planet_mass, G, N)
+        # 3) Get new accleration for each particle
+        particle_acc = getAcc(particle_pos, particle_mass, G, N)
 
         # 4) Second half of kick --> update velocities
-        planet_vel += planet_acc * (td / 2.0)
+        particle_vel += particle_acc * (td / 2.0)
 
         # 6) Append to data that will be outputed
-        data = format(data, planet_pos)
+        data = format(data, particle_pos)
     
     generateOutput(data, output)
 
