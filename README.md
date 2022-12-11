@@ -9,7 +9,7 @@ This project simulates how particles move through space using the N-body problem
 
 ## Components
 **Python**
-* nbody.py - Generates positions of N particles over given timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
+* nbody.py - Generates positions of N particles over a given number of timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
 
 This is an example of running this program for N=100 and timesteps=50:
 
