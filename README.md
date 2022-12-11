@@ -8,13 +8,13 @@ N-body Simulation using Python and Cuda.
 3. (Optional) Run performance evaluation of Python and Cuda versions.
 
 ## Components
-Python
-  * nbody.py - Generates positions of N particles over given timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
-  This is an example of running this program for N=100 and timesteps=50:
+**Python**
+* nbody.py - Generates positions of N particles over given timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
+This is an example of running this program for N=100 and timesteps=50:
 
-  ```
-  python3 nbody.py 100 50
-  ```
+```
+python3 nbody.py 100 50
+ ```
 
 * simulator.py - Plots the movement of particle postions generated from nbody.py and nbody.cu. The input file used in this program is specified as a command line argument.
 This is an example of runing the simulation with an input file called output_py.txt:
@@ -24,7 +24,7 @@ python3 simulator.py output_py.txt
 
 ```
 
-C++/Cuda
+**C++/Cuda**
 * nbody.cu - Generates positions of N particles over given timesteps. This program is located in the src/ directory.
 To run this program you must set up a `build/` directory for CMake:
 
