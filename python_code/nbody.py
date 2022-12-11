@@ -67,8 +67,9 @@ def format(data, p):
 # Write data to output file
 # data: array of maxtix of postions of particles for each timestep
 # output_file: name of output file
-def generateOutput(data, output_file):
+def generateOutput(data, output_file, runtime):
     f = open(output_file, 'a')
+    f.write(str(runtime) + "\n")
     for i in range(len(data)):
         f.write(str(data[i]) + "\n")
     f.close()
@@ -131,11 +132,11 @@ def main():
 
         # 6) Append to data that will be outputed
         data = format(data, particle_pos)
-    
-    generateOutput(data, output)
 
     # Get end time of simuation
     t_end = time.time()
     print("Computation duration: ", t_end - t_start)
+
+    generateOutput(data, output, t_end - t_start)
 
 main()

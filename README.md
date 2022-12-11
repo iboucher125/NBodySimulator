@@ -4,12 +4,12 @@ This project simulates how particles move through space using the N-body problem
 
 ## Steps To Run N-Body Simulation:
 1. Run nbody.py OR nbody.cu to generate data from the N-body simulation.
-2. Run simulator.py to visulize the simulation.
-3. (Optional) Run performance evaluation of Python and Cuda versions (not implemented yet...).
+2. Run simulator.py to visualize the simulation.
+3. (Optional) Run evaluate.py to visualize the performance evaluation of the serial and parallel implementations.
 
 ## Components
 **Python**
-* nbody.py - Generates positions of N particles over given timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
+* nbody.py - Generates positions of N particles over a given number of timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
 
 This is an example of running this program for N=100 and timesteps=50:
 
@@ -23,6 +23,15 @@ This is an example of running the simulation with an input file called output_py
 
 ```
 python3 simulator.py output_py.txt
+
+```
+
+* evaluate.py - Plots the runtime of both nbody.py and nbody.cu as the number of bodies increases in powers of two and the number of timestesp is 150. The number of iterations (times number of bodies increases) is specified as a command line argument.
+
+This is an example of running the evaluation with iterations=5 (N=[2,4,8,16,32]):
+
+```
+python3 evaluate.py 5
 
 ```
 
