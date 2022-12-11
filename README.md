@@ -1,9 +1,8 @@
 # NBodySimulator
 ## Summary
-
 N-body Simulation using Python and Cuda.
 
-## Steps To Run N-Body Simulations:
+## Steps To Run N-Body Simulation:
 1. Run nbody.py OR nbody.cu
 2. Run simulator.py
 3. (Optional) Run performance evaluation of Python and Cuda versions.
@@ -17,7 +16,7 @@ This is an example of running this program for N=100 and timesteps=50:
 python3 nbody.py 100 50
 ```
 
-* simulator.py - Plots the movemnt of particle postions generated from nbody.py and nbody.cu. The input file used in this program is specified as a command line argument.
+* simulator.py - Plots the movement of particle postions generated from nbody.py and nbody.cu. The input file used in this program is specified as a command line argument.
 This is an example of runing the simulation with an input file called output_py.txt:
 
 ```
