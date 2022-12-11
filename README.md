@@ -9,12 +9,12 @@ N-body Simulation using Python and Cuda.
 
 ## Components
 Python
-* nbody.py - Generates positions of N particles over given timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
-This is an example of running this program for N=100 and timesteps=50:
+  * nbody.py - Generates positions of N particles over given timesteps. This program is located in the python_code/ directory. N and timesteps are command line arguments. This program generates an output file called output_py.txt.
+  This is an example of running this program for N=100 and timesteps=50:
 
-```
-python3 nbody.py 100 50
-```
+  ```
+  python3 nbody.py 100 50
+  ```
 
 * simulator.py - Plots the movement of particle postions generated from nbody.py and nbody.cu. The input file used in this program is specified as a command line argument.
 This is an example of runing the simulation with an input file called output_py.txt:
