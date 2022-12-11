@@ -2,6 +2,7 @@ import numpy as np
 import math
 import time
 import matplotlib.pyplot as plt 
+import sys
 
 ''' 
 * Generate movement of planets using the N-body problem. 
@@ -75,7 +76,7 @@ def main():
     ''' Generate N-body Simulation Data '''
 
     # Number of particles (start with 2)
-    N = 100
+    N = int(sys.argv[1])
     # Newton's Gravitational Constant
     G = 6.67 * 10**-11
     # Random number generator seed
@@ -104,7 +105,7 @@ def main():
 
     # Set number of timesteps (number of interations for simulation)
     td = 0.01 # Timestep duration
-    timesteps = 100 # Number of timesteps
+    timesteps = int(sys.argv[2]) # Number of timesteps
 
     f = open(output, 'w+')
     f.write("Positions of " + str(N) + " planets over " + str(timesteps) + " timesteps: \n")

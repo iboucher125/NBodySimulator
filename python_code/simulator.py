@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt 
+import sys
 
 '''
 * Visulizes the N-body simulation from a dataset
@@ -8,7 +9,7 @@ import matplotlib.pyplot as plt
 def main():
     # Path for output file
     #f = open("../data/output_py.txt", 'r')
-    f = open("../data/output_cu.txt", 'r')
+    f = open("../data/" + sys.argv[1], 'r')
     content = f.readlines()
 
     # Recreate N x 1 array of planet masses
