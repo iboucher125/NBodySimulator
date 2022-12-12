@@ -57,27 +57,27 @@ include CMakeFiles/nbody.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/nbody.dir/flags.make
 
-CMakeFiles/nbody.dir/scr/nbody.cu.o: CMakeFiles/nbody.dir/flags.make
-CMakeFiles/nbody.dir/scr/nbody.cu.o: ../scr/nbody.cu
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/nbody.dir/scr/nbody.cu.o"
-	/usr/local/cuda-11.4/bin/nvcc  $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -c /cps/home/iboucher/Desktop/Parallel/NBodySimulator/scr/nbody.cu -o CMakeFiles/nbody.dir/scr/nbody.cu.o
+CMakeFiles/nbody.dir/src/nbody.cu.o: CMakeFiles/nbody.dir/flags.make
+CMakeFiles/nbody.dir/src/nbody.cu.o: ../src/nbody.cu
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/nbody.dir/src/nbody.cu.o"
+	/usr/local/cuda-11.4/bin/nvcc  $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -c /cps/home/iboucher/Desktop/Parallel/NBodySimulator/src/nbody.cu -o CMakeFiles/nbody.dir/src/nbody.cu.o
 
-CMakeFiles/nbody.dir/scr/nbody.cu.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/nbody.dir/scr/nbody.cu.i"
+CMakeFiles/nbody.dir/src/nbody.cu.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/nbody.dir/src/nbody.cu.i"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
 
-CMakeFiles/nbody.dir/scr/nbody.cu.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/nbody.dir/scr/nbody.cu.s"
+CMakeFiles/nbody.dir/src/nbody.cu.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/nbody.dir/src/nbody.cu.s"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
 
 # Object files for target nbody
 nbody_OBJECTS = \
-"CMakeFiles/nbody.dir/scr/nbody.cu.o"
+"CMakeFiles/nbody.dir/src/nbody.cu.o"
 
 # External object files for target nbody
 nbody_EXTERNAL_OBJECTS =
 
-nbody: CMakeFiles/nbody.dir/scr/nbody.cu.o
+nbody: CMakeFiles/nbody.dir/src/nbody.cu.o
 nbody: CMakeFiles/nbody.dir/build.make
 nbody: CMakeFiles/nbody.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CUDA executable nbody"

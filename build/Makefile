@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named nbody_not_opt
+
+# Build rule for target.
+nbody_not_opt: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 nbody_not_opt
+.PHONY : nbody_not_opt
+
+# fast build rule for target.
+nbody_not_opt/fast:
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/build
+.PHONY : nbody_not_opt/fast
+
+#=============================================================================
 # Target rules for targets named nbody
 
 # Build rule for target.
@@ -123,32 +136,59 @@ nbody/fast:
 	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/build
 .PHONY : nbody/fast
 
-scr/nbody.o: scr/nbody.cu.o
+src/nbody.o: src/nbody.cu.o
 
-.PHONY : scr/nbody.o
+.PHONY : src/nbody.o
 
 # target to build an object file
-scr/nbody.cu.o:
-	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/scr/nbody.cu.o
-.PHONY : scr/nbody.cu.o
+src/nbody.cu.o:
+	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/src/nbody.cu.o
+.PHONY : src/nbody.cu.o
 
-scr/nbody.i: scr/nbody.cu.i
+src/nbody.i: src/nbody.cu.i
 
-.PHONY : scr/nbody.i
+.PHONY : src/nbody.i
 
 # target to preprocess a source file
-scr/nbody.cu.i:
-	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/scr/nbody.cu.i
-.PHONY : scr/nbody.cu.i
+src/nbody.cu.i:
+	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/src/nbody.cu.i
+.PHONY : src/nbody.cu.i
 
-scr/nbody.s: scr/nbody.cu.s
+src/nbody.s: src/nbody.cu.s
 
-.PHONY : scr/nbody.s
+.PHONY : src/nbody.s
 
 # target to generate assembly for a file
-scr/nbody.cu.s:
-	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/scr/nbody.cu.s
-.PHONY : scr/nbody.cu.s
+src/nbody.cu.s:
+	$(MAKE) -f CMakeFiles/nbody.dir/build.make CMakeFiles/nbody.dir/src/nbody.cu.s
+.PHONY : src/nbody.cu.s
+
+src/nbody_not_opt.o: src/nbody_not_opt.cu.o
+
+.PHONY : src/nbody_not_opt.o
+
+# target to build an object file
+src/nbody_not_opt.cu.o:
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/src/nbody_not_opt.cu.o
+.PHONY : src/nbody_not_opt.cu.o
+
+src/nbody_not_opt.i: src/nbody_not_opt.cu.i
+
+.PHONY : src/nbody_not_opt.i
+
+# target to preprocess a source file
+src/nbody_not_opt.cu.i:
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/src/nbody_not_opt.cu.i
+.PHONY : src/nbody_not_opt.cu.i
+
+src/nbody_not_opt.s: src/nbody_not_opt.cu.s
+
+.PHONY : src/nbody_not_opt.s
+
+# target to generate assembly for a file
+src/nbody_not_opt.cu.s:
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/src/nbody_not_opt.cu.s
+.PHONY : src/nbody_not_opt.cu.s
 
 # Help Target
 help:
@@ -157,11 +197,15 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... nbody_not_opt"
 	@echo "... rebuild_cache"
 	@echo "... nbody"
-	@echo "... scr/nbody.o"
-	@echo "... scr/nbody.i"
-	@echo "... scr/nbody.s"
+	@echo "... src/nbody.o"
+	@echo "... src/nbody.i"
+	@echo "... src/nbody.s"
+	@echo "... src/nbody_not_opt.o"
+	@echo "... src/nbody_not_opt.i"
+	@echo "... src/nbody_not_opt.s"
 .PHONY : help
 
 

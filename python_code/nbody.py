@@ -90,7 +90,9 @@ def main():
     t_start = time.time()
 
     # Create N x 3 matrix of random starting postion of particles (size N) -> each partile has x,y,z corrdinate
-    particle_pos = np.random.randn(N, 3)
+    # particle_pos = np.random.randn(N, 3)
+    particle_pos = np.random.uniform(-2.5, 2.5, N *3)
+    particle_pos = np.reshape(particle_pos, (-1,3))
 
     # Data that will be outputed
     data = format([], particle_pos)

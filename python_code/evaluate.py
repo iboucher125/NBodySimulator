@@ -38,12 +38,14 @@ def runSim(N, iterations):
     return py_runtimes, cu_runtimes, n_vals
 
 def graph(py, cu, n_vals):
+    plt.xscale("log")
     plt.title(label="Runtime Comparision", fontsize=20, color='black')
     plt.plot(n_vals, py, label="Serial Implementation")
     plt.plot(n_vals, cu, label="Parallel Implementation")
     plt.xlabel('# of Particles')
     plt.ylabel('Runtime (sec)')
-    plt.show()
+    plt.legend()
+    plt.savefig("../figures/Evaluate_" + str(len(n_vals)) + "_iter.png")
 
 def main():
     ''' Run Evaluation of Serial vs Parallel Implementaiton '''

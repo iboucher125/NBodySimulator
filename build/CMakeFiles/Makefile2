@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /cps/home/iboucher/Desktop/Parallel/NBodySimulator/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/nbody_not_opt.dir/all
 all: CMakeFiles/nbody.dir/all
 
 .PHONY : all
@@ -63,9 +64,37 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/nbody_not_opt.dir/clean
 clean: CMakeFiles/nbody.dir/clean
 
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/nbody_not_opt.dir
+
+# All Build rule for target.
+CMakeFiles/nbody_not_opt.dir/all:
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/depend
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles --progress-num=3,4 "Built target nbody_not_opt"
+.PHONY : CMakeFiles/nbody_not_opt.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/nbody_not_opt.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/nbody_not_opt.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles 0
+.PHONY : CMakeFiles/nbody_not_opt.dir/rule
+
+# Convenience name for target.
+nbody_not_opt: CMakeFiles/nbody_not_opt.dir/rule
+
+.PHONY : nbody_not_opt
+
+# clean rule for target.
+CMakeFiles/nbody_not_opt.dir/clean:
+	$(MAKE) -f CMakeFiles/nbody_not_opt.dir/build.make CMakeFiles/nbody_not_opt.dir/clean
+.PHONY : CMakeFiles/nbody_not_opt.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/nbody.dir

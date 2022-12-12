@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/nbody.dir/scr/nbody.cu.o"
+  "CMakeFiles/nbody.dir/src/nbody.cu.o"
   "nbody"
   "nbody.pdb"
 )

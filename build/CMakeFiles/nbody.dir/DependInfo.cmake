@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CUDA
-  "/cps/home/iboucher/Desktop/Parallel/NBodySimulator/scr/nbody.cu" "/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles/nbody.dir/scr/nbody.cu.o"
+  "/cps/home/iboucher/Desktop/Parallel/NBodySimulator/src/nbody.cu" "/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles/nbody.dir/src/nbody.cu.o"
   )
 set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
 
