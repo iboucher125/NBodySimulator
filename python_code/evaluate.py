@@ -21,7 +21,9 @@ def runSim(bodies, iterations):
         f_py.close()
 
         # Get parallel nbody runtime
+        os.chdir("../build")
         os.system("./nbody " + str(bodies) + " 150")
+        os.chdir("../python_code")
         f_cu = open("../data/output_cu.txt", 'r')
         content_cu = f_cu.readlines()
         cu_runtimes.append(float(content_cu[2]))
