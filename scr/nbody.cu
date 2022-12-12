@@ -69,7 +69,6 @@ __device__ void get_vel_kernel(double *v, double *a, double td) {
   // Update position of singular particle (drift)
 __device__ void get_pos_kernel(double *p, double *v, double *data, double td, int N, int i) {
   int tid = threadIdx.x + blockIdx.x * blockDim.x;
-  // new position = position + velocity * td
   p[0 + tid * 3] = p[0 + tid * 3] + (v[0 + tid * 3] * td);
   p[1 + tid * 3] = p[1 + tid * 3] + (v[1 + tid * 3] * td);
   p[2 + tid * 3] = p[2 + tid * 3] + (v[2 + tid * 3] * td);
@@ -231,7 +230,6 @@ int main(int argc, char** argv) {
   auto t_end = std::chrono::high_resolution_clock::now();
   // Runtime duration in seconds
   auto total_time = std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start) * 0.000001;
-  std::cout << "Computation Duration: " << total_time.count() << std::endl;
 
   // Write to output file
   std::ofstream output_file;

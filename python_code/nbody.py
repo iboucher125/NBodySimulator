@@ -27,7 +27,6 @@ def getAcc(p, m, G, N):
         for j in range(N):
             if j != i:
                 # Get difference in position of neighboring particle
-                # Need x, y, z of current neighboring particle [x, y, z] --> 0, 1, 2
                 dx = p[j][0] - p[i][0]
                 dy = p[j][1] - p[i][1]
                 dz = p[j][2] - p[i][2]
@@ -89,7 +88,6 @@ def main():
 
     # Start timer -> for performance comparision
     t_start = time.time()
-    print("Generating data...")
 
     # Create N x 3 matrix of random starting postion of particles (size N) -> each partile has x,y,z corrdinate
     particle_pos = np.random.randn(N, 3)
@@ -135,8 +133,8 @@ def main():
 
     # Get end time of simuation
     t_end = time.time()
-    print("Computation duration: ", t_end - t_start)
 
+    # Write to output file
     generateOutput(data, output, t_end - t_start)
 
 main()
