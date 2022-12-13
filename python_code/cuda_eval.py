@@ -3,8 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 '''
-* This program generates a graph comparing runtime of serial and parallel 
-implemetation of the N-body simulation.
+* This program generates a graph comparing runtime of nbody.cu and nbody_not_opt.cu.
 * N increases in powers of 2
 * Number of timsteps is constant (150).
 '''
