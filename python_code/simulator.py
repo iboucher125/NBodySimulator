@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import sys
 
 '''
-* Visulizes the N-body simulation from a dataset
+* This program visulizes the N-body simulation from a dataset
 '''
 
 def main():

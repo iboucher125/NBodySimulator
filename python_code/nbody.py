@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import sys
 
 ''' 
-* Generate movement of particles using the N-body problem. 
-* Produces an output file with particles' positions over number of timesteps.
+* This program generates the movement of particles using the N-body problem. 
+* Produces an output file with particles' positions over a given number of timesteps.
 '''
 
 # Return matrix of accelertaions (x, y, z) for each particle
@@ -64,7 +64,7 @@ def format(data, p):
     return data
 
 # Write data to output file
-# data: array of maxtix of postions of particles for each timestep
+# data: Maxtix of postions of particles for each timestep of the simulation
 # output_file: name of output file
 def generateOutput(data, output_file, runtime):
     f = open(output_file, 'a')

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 '''
 * This program generates a graph comparing runtime of the serial and parallel 
-implemetation of the N-body simulation.
+implemetations of the N-body simulation.
 * N increases in powers of 2
 * Number of timsteps is constant (150).
 '''
@@ -15,7 +15,7 @@ def runSim(N, iterations):
     n_vals = []
     for i in range(iterations):
         n_vals.append(N)
-        print("Running simulation with N = " + str(N))
+        print("Running evaluation with N = " + str(N))
 
         # Get serial nbody runtime
         os.system("python3 nbody.py " + str(N) + " 150")
@@ -49,7 +49,7 @@ def graph(py, cu, n_vals):
     plt.savefig("../figures/Evaluate_" + str(len(n_vals)) + "_iter.png")
 
 def main():
-    ''' Run Evaluation of Serial vs Parallel Implementaiton '''
+    ''' Run Evaluation of Serial vs Parallel Implementaitons '''
 
     iterations = int(sys.argv[1])
     py, cu, n_vals= runSim(2, iterations)

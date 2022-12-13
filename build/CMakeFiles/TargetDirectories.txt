@@ -1,4 +1,0 @@
-/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles/edit_cache.dir
-/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles/nbody_not_opt.dir
-/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles/rebuild_cache.dir
-/cps/home/iboucher/Desktop/Parallel/NBodySimulator/build/CMakeFiles/nbody.dir

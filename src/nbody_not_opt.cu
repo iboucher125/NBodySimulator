@@ -9,9 +9,6 @@
 #include <math.h>
 #include <fstream>
 
-// #define N 
-// #define N_BLOCKS 1
-
 /*** GPU functions ***/
 
 // Update acceleration of particles
@@ -162,7 +159,7 @@ double* n_body(int N, double G, double td, int timesteps) {
   cudaMemcpy(d_particle_vel, particle_vel, N * 3 * sizeof(double), cudaMemcpyHostToDevice);
   cudaMemcpy(d_data, data, N * 3 * timesteps * sizeof(double), cudaMemcpyHostToDevice);
 
-  // Determine number of threads and blocks based on N
+  // Determine number of blocks based on N
   int n_blocks;
   if  (N % 1024 == 0){
     n_blocks = N / 1024;
@@ -171,8 +168,17 @@ double* n_body(int N, double G, double td, int timesteps) {
     n_blocks = 1 + floor(N / 1024);
   }
 
+  // Deterine number of threads based on N
+  int n_threads;
+  if (N <= 1024){
+    n_threads = N;
+  }
+  else{
+    n_threads = 1024;
+  }
+
   // Get acceleration of particles --> call GPU kernel here
-  get_acc_kernel<<<n_blocks, N>>>(d_particle_pos, d_particle_mass, d_particle_acc, G, N);
+  get_acc_kernel<<<n_blocks, n_threads>>>(d_particle_pos, d_particle_mass, d_particle_acc, G, N);
 
   // Copy new accelerations device to host
   cudaMemcpy(particle_acc, d_particle_acc, N * 3 * sizeof(double), cudaMemcpyDeviceToHost);
@@ -182,19 +188,19 @@ double* n_body(int N, double G, double td, int timesteps) {
     // Have to call multiple kernels and use cudaDeviceSynchronize()
     // Use leapfrog integration
     // 1) First half kick --> update velocities
-    get_vel_kernel<<<n_blocks, N>>>(d_particle_vel, d_particle_acc, td);
+    get_vel_kernel<<<n_blocks, n_threads>>>(d_particle_vel, d_particle_acc, td);
     cudaDeviceSynchronize();
 
     // 2) Drift --> update positions
-    get_pos_kernel<<<n_blocks, N>>>(d_particle_pos, d_particle_vel, d_data, td, N, i);
+    get_pos_kernel<<<n_blocks, n_threads>>>(d_particle_pos, d_particle_vel, d_data, td, N, i);
     cudaDeviceSynchronize();
 
     // 3) update acceleration with new positions
-    get_acc_kernel<<<n_blocks, N>>>(d_particle_pos, d_particle_mass, d_particle_acc, G, N);
+    get_acc_kernel<<<n_blocks, n_threads>>>(d_particle_pos, d_particle_mass, d_particle_acc, G, N);
     cudaDeviceSynchronize();
 
     // 4) Second half od kick --> update velocities again
-    get_vel_kernel<<<n_blocks, N>>>(d_particle_vel, d_particle_acc, td);
+    get_vel_kernel<<<n_blocks, n_threads>>>(d_particle_vel, d_particle_acc, td);
   }
 
   // Copy varibles device to host --> maybe just need 
@@ -253,7 +259,6 @@ int main(int argc, char** argv) {
 
   // Write runtime duration
   output_file << total_time.count() << "\n";
-  std::cout << N << " Runtime: " << total_time.count() << std::endl;
 
   // Write positions
   int curr_step = 0;

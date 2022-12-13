@@ -40,19 +40,17 @@ def runSim(N, iterations):
     return cpu_runtimes, gpu_runtimes, n_vals
 
 def graph(cpu, gpu, n_vals):
-    print("CPU: ",cpu)
-    print("GPU: ", gpu)
     plt.xscale("log")
     plt.title(label="Runtime Comparision", fontsize=20, color='black')
-    plt.plot(n_vals, cpu, label="CPU")
-    plt.plot(n_vals, gpu, label="GPU")
-    plt.xlabel('# of Particles')
+    plt.plot(n_vals, cpu, label="nbody_not_opt.cu")
+    plt.plot(n_vals, gpu, label="nbody.cu")
+    plt.xlabel('Number of Particles (log scale)')
     plt.ylabel('Runtime (sec)')
     plt.legend()
     plt.savefig("../figures/Cuda_evaluate_" + str(len(n_vals)) + "_iter.png")
 
 def main():
-    ''' Run Evaluation of Serial vs Parallel Implementaiton '''
+    ''' Run Evaluation of original parallel version vs final parallel version '''
 
     iterations = int(sys.argv[1])
     cpu, gpu, n_vals= runSim(2, iterations)

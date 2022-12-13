@@ -186,7 +186,7 @@ double* n_body(int N, double G, double td, int timesteps) {
   cudaMemcpy(d_particle_vel, particle_vel, N * 3 * sizeof(double), cudaMemcpyHostToDevice);
   cudaMemcpy(d_data, data, N * 3 * timesteps * sizeof(double), cudaMemcpyHostToDevice);
 
-  // Determine number of threads and blocks based on N
+  // Determine number of blocks based on N
   int n_blocks;
   if  (N % 1024 == 0){
     n_blocks = N / 1024;
@@ -194,10 +194,18 @@ double* n_body(int N, double G, double td, int timesteps) {
   else{
     n_blocks = 1 + floor(N / 1024);
   }
-  // std::cout << n_blocks << std::endl;
+
+  // Deterine number of threads based on N
+  int n_threads;
+  if (N <= 1024){
+    n_threads = N;
+  }
+  else{
+    n_threads = 1024;
+  }
 
   // Call GPU kernel to run simulation
-  generate_data_kernel<<<n_blocks, N>>>(d_particle_pos, d_particle_vel, d_particle_mass, d_particle_acc, d_data,timesteps, td, G, N);
+  generate_data_kernel<<<n_blocks, n_threads>>>(d_particle_pos, d_particle_vel, d_particle_mass, d_particle_acc, d_data,timesteps, td, G, N);
 
   // Copy varibles device to host --> maybe just need 
   cudaMemcpy(data, d_data, (N * 3 * timesteps +N) * sizeof(double), cudaMemcpyDeviceToHost);
@@ -255,7 +263,6 @@ int main(int argc, char** argv) {
 
   // Write runtime duration
   output_file << total_time.count() << "\n";
-  std::cout << N << " Runtime: " << total_time.count() << std::endl;
 
   // Write positions
   int curr_step = 0;

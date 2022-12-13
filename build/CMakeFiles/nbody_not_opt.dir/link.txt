@@ -1,1 +1,0 @@
-/usr/bin/g++  CMakeFiles/nbody_not_opt.dir/src/nbody_not_opt.cu.o -o nbody_not_opt  -L"/usr/local/cuda-11.4/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda-11.4/targets/x86_64-linux/lib" -lcudadevrt -lcudart_static -lrt -lpthread -ldl
