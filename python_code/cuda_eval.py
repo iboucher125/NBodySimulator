@@ -17,7 +17,7 @@ def runSim(N, iterations):
         n_vals.append(N)
         print("Running simulation with N = " + str(N))
 
-        # Get time integration in CPU function runtime
+        # Get runtime of version with time integration in CPU function
         os.chdir("../build")
         os.system("./nbody_not_opt " + str(N) + " 150")
         f_cpu = open("../data/output_cu.txt", 'r')
@@ -25,7 +25,7 @@ def runSim(N, iterations):
         cpu_runtimes.append(float(content_cpu[2]))
         f_cpu.close()
 
-        # Get time integration in GPU kernel runtime
+        # Get runtime of version with time integration in GPU kernel
         os.system("./nbody " + str(N) + " 150")
         f_gpu = open("../data/output_cu.txt", 'r')
         content_gpu = f_gpu.readlines()
@@ -55,7 +55,7 @@ def main():
     ''' Run Evaluation of Serial vs Parallel Implementaiton '''
 
     iterations = int(sys.argv[1])
-    cpu, gpu, n_vals= runSim(1000, iterations)
+    cpu, gpu, n_vals= runSim(2, iterations)
     graph(cpu, gpu, n_vals)
 
 main()

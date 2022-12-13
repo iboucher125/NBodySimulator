@@ -14,9 +14,6 @@ def main():
     # Recreate N x 1 array of particle masses
     masses = content[1].replace("[", "").replace("]", "").replace(",", "").split()
     particle_mass = np.array(masses).astype(float)
-    # print(particle_mass)
-
-    runtime = content[2]
     
     # Visulization setup
     grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.0)

@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 '''
-* This program generates a graph comparing runtime of serial and parallel 
+* This program generates a graph comparing runtime of the serial and parallel 
 implemetation of the N-body simulation.
 * N increases in powers of 2
 * Number of timsteps is constant (150).
@@ -16,6 +16,7 @@ def runSim(N, iterations):
     for i in range(iterations):
         n_vals.append(N)
         print("Running simulation with N = " + str(N))
+
         # Get serial nbody runtime
         os.system("python3 nbody.py " + str(N) + " 150")
         f_py = open("../data/output_py.txt", 'r')
@@ -42,7 +43,7 @@ def graph(py, cu, n_vals):
     plt.title(label="Runtime Comparision", fontsize=20, color='black')
     plt.plot(n_vals, py, label="Serial Implementation")
     plt.plot(n_vals, cu, label="Parallel Implementation")
-    plt.xlabel('# of Particles')
+    plt.xlabel('Number of Particles (log scale)')
     plt.ylabel('Runtime (sec)')
     plt.legend()
     plt.savefig("../figures/Evaluate_" + str(len(n_vals)) + "_iter.png")

@@ -9,9 +9,6 @@
 #include <math.h>
 #include <fstream>
 
-// #define N_THREADS 
-#define N_BLOCKS 1
-
 /*** GPU functions ***/
 
 // Update acceleration of particles
@@ -72,7 +69,6 @@ __device__ void get_pos_kernel(double *p, double *v, double *data, double td, in
 
 // Run N-body simulation
 __global__ void generate_data_kernel(double *p, double * v, double *m, double *a, double *data, int timesteps, double td, int G, int N) {
-  int tid = threadIdx.x + blockIdx.x * blockDim.x;
   // Get acceleration of particles
   get_acc_kernel(p, m, a, G, N);
   __syncthreads();
@@ -190,8 +186,18 @@ double* n_body(int N, double G, double td, int timesteps) {
   cudaMemcpy(d_particle_vel, particle_vel, N * 3 * sizeof(double), cudaMemcpyHostToDevice);
   cudaMemcpy(d_data, data, N * 3 * timesteps * sizeof(double), cudaMemcpyHostToDevice);
 
+  // Determine number of threads and blocks based on N
+  int n_blocks;
+  if  (N % 1024 == 0){
+    n_blocks = N / 1024;
+  }
+  else{
+    n_blocks = 1 + floor(N / 1024);
+  }
+  // std::cout << n_blocks << std::endl;
+
   // Call GPU kernel to run simulation
-  generate_data_kernel<<<N_BLOCKS, N>>>(d_particle_pos, d_particle_vel, d_particle_mass, d_particle_acc, d_data,timesteps, td, G, N);
+  generate_data_kernel<<<n_blocks, N>>>(d_particle_pos, d_particle_vel, d_particle_mass, d_particle_acc, d_data,timesteps, td, G, N);
 
   // Copy varibles device to host --> maybe just need 
   cudaMemcpy(data, d_data, (N * 3 * timesteps +N) * sizeof(double), cudaMemcpyDeviceToHost);
