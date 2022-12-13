@@ -6,6 +6,7 @@ This project simulates how particles move through space using the N-body problem
 1. Run nbody.py OR nbody.cu to generate data from the N-body simulation.
 2. Run simulator.py to visualize the simulation.
 3. (Optional) Run evaluate.py to visualize the performance evaluation of the serial and parallel implementations.
+4. (Optional) Run cuda_eval.py to visualize the performance evaluation of nbody_not_opt.cu and nbody.cu.
 
 ## Components
 **Python**
