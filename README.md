@@ -66,13 +66,13 @@ After compliling, this program can be run using N and timesteps as command line 
 This is an example of running this program for N=100 and timesteps=50:
 
 ```
-nbody.cu 100 50
+./nbody 100 50
 ```
 
 * nbody_not_opt.cu - This is an earlier version of our GPU based n-body simulation where the time integration is implemnted in a CPU fucntion rather than a GPU kernel. This program Generates positions of N particles over a given number of timesteps. This program is located in the src/ directory.
 
 ```
-nbody_not_opt.cu 100 50
+./nbody_not_opt 100 50
 ```
 
 **Additional Directories**
